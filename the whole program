@@ -1,0 +1,432 @@
+from livewires import games, color
+import random
+import time
+import math
+import pygame
+from tkinter import *
+
+
+
+
+
+
+def main ():
+    games.init(screen_width=1350, screen_height=700, fps=60)
+    prapaskena=games.load_image ("Prapaskena.jpg", transparent=False)
+    games.screen.background=prapaskena       
+
+
+
+
+
+
+    side_image2=games.load_image("Bardha.jpg") 
+    tavani=Thrower(image=side_image2,
+                   t1=time.time(),
+                   t2=time.time())
+    basket_image=games.load_image("Shportapng.png")
+    shporta=Basket(image=basket_image,
+                   scores=0)
+    games.screen.add(tavani)
+    games.screen.add(shporta)
+    games.screen.mainloop()  
+    Dalja.results_output()
+   
+
+class Leaf (games.Sprite):
+    def update (self):
+        if  self.y>750:
+            self.destroy()
+            Basket.lifes-=1
+            Basket.l=0
+            Basket.ll=-1
+
+    
+class Heart (games.Sprite):
+    def update(self):
+     
+        if  self.y>750:
+            ind=Thrower.hearT.index(self)
+            del Thrower.hearT[ind]
+            Thrower.j-=1
+            self.destroy()
+            
+            
+
+
+
+class Thrower(games.Sprite):
+    j=-1
+    
+    hearT=[]
+    
+    def __init__(self, image, t1, t2):
+             
+        super(Thrower, self).__init__(image,
+                                      x=1200,
+                                      y=380)
+        self.t1=t1
+        self.t2=t2
+    
+    
+
+    
+    def update(self, n=0):
+
+        self.p=random.randrange (0,2400-int(2*math.log(1+time.time()-self.t2, 2.78)))
+        if time.time()-self.t1>1/math.log(1+time.time()-self.t2, 2.78):
+            n+=1
+            self.leaf=[]
+            rx=random.randrange (50,1000)
+            
+            leaf_image=games.load_image("Gjethe.png", transparent=True)
+            self.leaf.append(Leaf(image=leaf_image,
+                             x=rx,
+                             y=-100,
+                             dy=random.randrange(1,5)+math.log(1+time.time()-self.t2, 2.78)))
+            games.screen.add(self.leaf[n-1])
+            self.t1=time.time()
+            
+        if self.p==0:
+            Thrower.j+=1
+           
+            rx=random.randrange (50,1000)
+            
+            heart_image=games.load_image("zemra2.png", transparent=True)
+            Thrower.hearT.append(Heart(image=heart_image,
+                             x=rx,
+                             y=-100,
+                             dy=random.randrange(1,4)+math.log(1+time.time()-self.t2, 2.78)))
+            games.screen.add(Thrower.hearT[Thrower.j])
+            
+
+
+
+
+
+class Basket(games.Sprite):
+    lifes=3
+    lifes_list=[]
+    l=0
+    k=0
+    n=0
+    ll=1
+    start=0
+
+
+    def __init__(self, image, scores):
+        super(Basket, self).__init__(image,
+                                     x=games.mouse.x,
+                                     y=650)
+        
+        self.scores=scores
+        self.score_display=games.Text(value=0, color=color.blue, size=100, x=1150, y=30)
+        self.lifes_display=games.Text(value=0, color=color.blue, size=100, x=25, y=30)
+    def update(self):
+        if games.mouse.x>965:
+            
+            self.x=965
+        elif games.mouse.x<58:
+            self.x=58
+        else:
+            self.x=games.mouse.x
+
+        self.check_collisions()
+        if Basket.k==0:
+            self.score_display.destroy()
+            self.score_display=games.Text(value=self.scores, color=color.blue, size=100, x=1150, y=30)
+            games.screen.add(self.score_display)
+            Basket.k+=1
+
+        if Basket.l==0:
+            self.lifes_display.destroy()
+            self.lifes_display=games.Text(value=Basket.lifes, color=color.blue, size=100, x=25, y=30)
+            games.screen.add(self.lifes_display)
+            Basket.l+=1
+            
+        if 100<=self.scores<200 and Basket.n==0:
+            self.photo_1=games.load_image("1.jpeg",transparent=False) 
+            self.honey_1=games.Sprite(image=self.photo_1, x=1200, y=380)
+            games.screen.add(self.honey_1)
+            Basket.n+=1
+        elif 200<=self.scores<400 and Basket.n==1:
+            self.photo_2=games.load_image("2.jpeg", transparent=False)
+            self.honey_2=games.Sprite(image=self.photo_2, x=1200, y=380)
+            games.screen.add(self.honey_2)
+            Basket.n+=1            
+            self.honey_1.destroy()
+        elif 400<=self.scores<700 and Basket.n==2:
+            self.photo_3=games.load_image("3.jpeg", transparent=False)
+            self.honey_3=games.Sprite(image=self.photo_3, x=1200, y=380)
+            games.screen.add(self.honey_3)
+            Basket.n+=1            
+            self.honey_2.destroy()   
+        elif 700<=self.scores<1100 and Basket.n==3:
+            self.photo_4=games.load_image("4.jpeg", transparent=False)
+            self.honey_4=games.Sprite(image=self.photo_4, x=1200, y=380)
+            games.screen.add(self.honey_4)
+            Basket.n+=1            
+            self.honey_3.destroy()
+        elif 1100<=self.scores<1600 and Basket.n==4:
+            self.photo_5=games.load_image("5.jpeg", transparent=False)
+            self.honey_5=games.Sprite(image=self.photo_5, x=1200, y=380)
+            games.screen.add(self.honey_5)
+            Basket.n+=1            
+            self.honey_4.destroy()
+        elif 1600<=self.scores<2200 and Basket.n==5:
+            self.photo_6=games.load_image("6.jpeg", transparent=False)
+            self.honey_6=games.Sprite(image=self.photo_6, x=1200, y=380)
+            games.screen.add(self.honey_6)
+            Basket.n+=1            
+            self.honey_5.destroy()
+        elif 2200<=self.scores<2900 and Basket.n==6:
+            self.photo_7=games.load_image("7.jpeg", transparent=False)
+            self.honey_7=games.Sprite(image=self.photo_7, x=1200, y=380)
+            games.screen.add(self.honey_7)
+            Basket.n+=1            
+            self.honey_6.destroy()
+        elif 2900<=self.scores<3700 and Basket.n==7:
+            self.photo_8=games.load_image("8.jpeg", transparent=False)
+            self.honey_8=games.Sprite(image=self.photo_8, x=1200, y=380)
+            games.screen.add(self.honey_8)
+            Basket.n+=1            
+            self.honey_7.destroy()
+        elif 3700<=self.scores<4600 and Basket.n==8:
+            self.photo_9=games.load_image("9.jpeg", transparent=False)
+            self.honey_9=games.Sprite(image=self.photo_9, x=1200, y=380)
+            games.screen.add(self.honey_9)
+            Basket.n+=1            
+            self.honey_8.destroy()
+        elif 4600<=self.scores<5600 and Basket.n==9:
+            self.photo_10=games.load_image("10.jpeg", transparent=False)
+            self.honey_10=games.Sprite(image=self.photo_10, x=1200, y=380)
+            games.screen.add(self.honey_10)
+            Basket.n+=1            
+            self.honey_9.destroy()
+        elif 5600<=self.scores<6700 and Basket.n==10:
+            self.photo_11=games.load_image("11.jpeg", transparent=False)
+            self.honey_11=games.Sprite(image=self.photo_11, x=1200, y=380)
+            games.screen.add(self.honey_11)
+            Basket.n+=1            
+            self.honey_10.destroy()
+
+
+
+        if  Basket.lifes==0:
+            
+            Basket.scores=self.scores
+            games.screen.quit()
+           
+            
+            
+            
+
+        if  Basket.start==0:
+            heart_image_big=games.load_image("zemra2.png", transparent=True)
+            Basket.lifes_list.append(Heart(image=heart_image_big,
+                             x=25,
+                             y=100))
+            Basket.lifes_list.append(Heart(image=heart_image_big,
+                             x=25,
+                             y=45+100))
+            Basket.start=1
+
+
+
+
+        if Basket.ll==1:
+            m=0
+            m1=0
+            while m1<Basket.lifes-1:
+                if Basket.lifes_list[m1]:
+                    Basket.lifes_list[m1].destroy()
+                    m1+=1
+                
+
+
+
+            Basket.lifes_list=[]
+            while m<Basket.lifes:
+                heart_image_big=games.load_image("zemra2.png", transparent=True)
+                Basket.lifes_list.append(Heart(image=heart_image_big,
+                             x=25,
+                             y=m*45+100))
+                games.screen.add(Basket.lifes_list[m])
+                m+=1
+            Basket.ll=0
+
+        if Basket.ll==-1:
+            m=0
+            m1=0
+            while m1<Basket.lifes+1:
+                if Basket.lifes_list[m1]:
+                    Basket.lifes_list[m1].destroy()
+                    m1+=1
+                
+
+
+
+            Basket.lifes_list=[]
+            while m<Basket.lifes:
+                heart_image_big=games.load_image("zemra2.png", transparent=True)
+                Basket.lifes_list.append(Heart(image=heart_image_big,
+                             x=25,
+                             y=m*45+100))
+                games.screen.add(Basket.lifes_list[m])
+                m+=1
+            Basket.ll=0
+            
+        
+    def check_collisions(self):
+        for objekt in self.overlapping_sprites:
+            if objekt in Thrower.hearT:
+                if Basket.lifes<=7:
+                    Basket.lifes+=1
+                else:
+                    self.scores+=300
+                    self.score()
+                Basket.l=0
+                Basket.ll=1
+                ind=Thrower.hearT.index(objekt)
+                del Thrower.hearT[ind]
+                Thrower.j-=1
+                objekt.destroy()
+                
+            else:
+                if objekt.y<=675:
+                    objekt.destroy()
+                    self.bonus=objekt.dy
+                    self.score()
+
+
+    def score(self):
+        self.scores=int(self.scores+10+3*self.bonus)
+        Basket.k=0
+
+
+
+
+class Dalja(object):
+    name="UNKNOWN"
+    def results_input():
+        
+        Dalja.all_results=open("All_Results.txt", "a+")
+        Dalja.best_results=open("Best_Results.txt", "w+")
+
+        Dalja.root=Tk()
+        Dalja.root.title("Player's Name")
+        Dalja.root.geometry("200x150")
+        Dalja.result_entrance=Frame(Dalja.root)
+        Dalja.result_entrance.grid()
+        Dalja.teksti_dales=Label(Dalja.result_entrance, text="Enter your name:")
+        Dalja.teksti_dales.grid()
+        Dalja.emri_hyres=Entry(Dalja.result_entrance)
+        Dalja.emri_hyres.grid(row=1, column=0, sticky=W)
+        Dalja.enter_button=Button(Dalja.result_entrance, text="ENTER", command=Dalja.show_name)
+        Dalja.enter_button.grid(row=2, column=0, sticky=W)        
+        Dalja.root.mainloop()
+        
+    def results_middle():
+        Dalja.results_input()
+
+        Dalja.all_results.write("\n")
+        Dalja.all_results.write(Dalja.name)
+        Dalja.all_results.write("\n")
+    
+        Dalja.all_results.write(str(Basket.scores))
+        Dalja.all_results.close()
+        Dalja.all_results=open("All_Results.txt", "r")
+        Dalja.all_results_list2=Dalja.all_results.readlines()
+        length2=len(Dalja.all_results_list2)
+        Dalja.all_results_list=[]
+        i2=0
+        while i2<=length2-2:
+           Dalja.all_results_list.append(Dalja.all_results_list2[i2][0:len(Dalja.all_results_list2[i2])-1])
+           i2+=1
+        Dalja.all_results_list.append(Dalja.all_results_list2[i2][0:len(Dalja.all_results_list2[i2])])
+   
+        length=len(Dalja.all_results_list)
+    
+        i1=1
+        j1=1
+        while i1<=length-1:
+            while j1<=length-1:
+                if int(Dalja.all_results_list[i1])>int(Dalja.all_results_list[j1]):
+                    Dalja.all_results_list[i1], Dalja.all_results_list[j1]=Dalja.all_results_list[j1], Dalja.all_results_list[i1]
+                    Dalja.all_results_list[i1-1], Dalja.all_results_list[j1-1]=Dalja.all_results_list[j1-1], Dalja.all_results_list[i1-1]
+                j1+=2
+            j1=1
+            i1+=2
+        k1=0
+        while k1<=length-1 and k1<=19:
+            Dalja.best_results.write(Dalja.all_results_list[k1])
+            Dalja.best_results.write(" ")
+
+            Dalja.best_results.write(str(Dalja.all_results_list[k1+1]))
+            Dalja.best_results.write("\n")
+
+            k1+=2
+        Dalja.best_results.close()
+
+
+
+    def results_output():
+
+        Dalja.results_middle()
+        Dalja.best_results=open("Best_Results.txt", "r")
+        high_scores=Dalja.best_results.read()
+        Dalja.root1=Tk()
+        Dalja.root1.title("HIGH SCORES")
+        Dalja.root1.geometry("300x800")
+
+
+
+        Dalja.high_scores_frame=Frame(Dalja.root1)
+        Dalja.high_scores_frame.grid()
+        Dalja.teksti_dales=Label(Dalja.high_scores_frame, text=Dalja.name + ": "+ str(Basket.scores))
+        Dalja.teksti_dales.grid()
+
+
+        Dalja.teksti_dales=Label(Dalja.high_scores_frame, text="Top 10 Results:")
+        Dalja.teksti_dales.grid()
+        
+        Dalja.teksti_dales=Label(Dalja.high_scores_frame, text=high_scores)
+        Dalja.teksti_dales.grid()
+        Dalja.root.mainloop()
+
+
+
+        
+        
+
+
+
+
+
+
+
+
+
+
+
+
+
+    def show_name():
+        Dalja.name=Dalja.emri_hyres.get()
+        if not Dalja.name:
+            Dalja.name="UNKNOWN"
+        Dalja.teksti_dales=Label(Dalja.result_entrance, text="Exit to see the HIGH SCORES table")
+        Dalja.teksti_dales.grid(row=3, column=0)
+        
+
+
+
+main()
+    
+ 
+
+
+
+
+
+
